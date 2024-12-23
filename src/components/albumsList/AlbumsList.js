@@ -1,7 +1,6 @@
-import { useState, useEffect } from "react";
 import { Table } from "@chakra-ui/react";
 
-import usePlaceholderService from "../../services/PlaceholderService";
+import { useFetchListItems } from "../../hooks/useFetchListItems";
 
 import PageHeading from "../pageHeading/PageHeading";
 import AlbumsItem from "../albumsItem/AlbumsItem";
@@ -9,37 +8,12 @@ import Spinner from "../spinner/Spinner";
 import ErrorMessage from "../errorMessage/ErrorMessage";
 
 const AlbumsList = () => {
-  const [albums, setAlbums] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
-  const { getAllAlbums } = usePlaceholderService();
-
-  useEffect(() => {
-    onRequest()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const onRequest = () => {
-    setLoading(true);
-    getAllAlbums()
-      .then(onDataLoaded)
-      .then(() => setLoading(false))
-      .catch(onError);
-  }
-
-  const onDataLoaded = (data) => {
-    setAlbums(data);
-  }
-
-  const onError = () => {
-    setError(true);
-    setLoading(loading => false);
-  }
+  const { data, loading, error, request } = useFetchListItems('albums');
 
   function renderItems(arr) {
     const albumsList = arr.map(item => {
       return (
-        <AlbumsItem key={item.id} {...item} callback={onRequest}/>
+        <AlbumsItem key={item.id} {...item} callback={request}/>
       )
     })
 
@@ -60,7 +34,7 @@ const AlbumsList = () => {
     )
   }
 
-  const items = renderItems(albums);
+  const items = renderItems(data);
 
   const errorMessage = error ? <ErrorMessage/> : null;
   const spinner = loading ? <Spinner /> : null;

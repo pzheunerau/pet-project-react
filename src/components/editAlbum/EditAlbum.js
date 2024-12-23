@@ -1,43 +1,33 @@
-import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 
-import usePlaceholderService from "../../services/PlaceholderService";
+import { useFetchItem } from "../../hooks/useFetchItem";
 
 import PageHeading from "../pageHeading/PageHeading";
 import AlbumForm from "../albumForm/AlbumForm";
 
 import Spinner from "../spinner/Spinner";
+import ErrorMessage from "../errorMessage/ErrorMessage";
 
 const EditAlbum = () => {
   const { id } = useParams();
-  const [userId, setUserId] = useState(null);
-  const [albumTitle, setAlbumTitle] = useState();
-  const [loading, setLoading] = useState(false);
-  const { getAlbumById } = usePlaceholderService();
+  const { data, loading, error } = useFetchItem('albums', id);
 
-  useEffect(() => {
-    onRequest();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
-
-  const onRequest = () => {
-    setLoading(true);
-    getAlbumById(id)
-      .then((data) => {
-        setUserId(data.userId);
-        setAlbumTitle(data.title);
-      })
-      .then(() => setLoading(false));
+  const Form = () => {
+    return (
+      <AlbumForm title={data.title} id={id} userId={data.userId} />
+    )
   }
 
-  if (loading) {
-    return <Spinner />
-  }
+  const errorMessage = error ? <ErrorMessage/> : null;
+  const spinner = loading ? <Spinner /> : null;
+  const content = !(loading || error) ? <Form /> : null;
 
   return (
     <>
       <PageHeading title="Edit album" link="/albums" />
-      <AlbumForm title={albumTitle} id={id} userId={userId} />
+      {errorMessage}
+      {spinner}
+      {content}
     </>
   )
 }

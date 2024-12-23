@@ -4,14 +4,20 @@ import { LuEye } from "react-icons/lu";
 import { LuPencilLine } from "react-icons/lu";
 import { LuTrash2 } from "react-icons/lu";
 
-import usePlaceholderService from "../../services/PlaceholderService";
+// import usePlaceholderService from "../../services/PlaceholderService";
+import { useDeleteItem } from "../../hooks/useDeleteItem";
 
 const AlbumsItem = (props) => {
   const { id, userId, title, callback } = props;
-  const { deleteAlbumById } = usePlaceholderService();
+  const { request, data } = useDeleteItem('albums', id);
+  // const { deleteAlbumById } = usePlaceholderService();
 
-  const deleteHandler = (id) => {
-    deleteAlbumById(id).then(callback());
+  // const deleteHandler = (id) => {
+  //   deleteAlbumById(id).then(callback());
+  // }
+
+  const deleteHandle = () => {
+    request().then(() => console.log(data)).then(callback());
   }
 
   return (
@@ -39,7 +45,7 @@ const AlbumsItem = (props) => {
             aria-label="Delete"
             colorPalette="red"
             onClick={() => {
-              deleteHandler(id)
+              deleteHandle()
             }}
           >
             <LuTrash2 />

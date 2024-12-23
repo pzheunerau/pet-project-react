@@ -1,9 +1,8 @@
-import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 
 import { Tabs } from "@chakra-ui/react";
 
-import usePlaceholderService from "../../services/PlaceholderService";
+import { useFetchItem } from "../../hooks/useFetchItem";
 
 import PageHeading from "../pageHeading/PageHeading";
 import AlbumInfo from "../albumInfo/AlbumInfo";
@@ -12,25 +11,7 @@ import Spinner from "../spinner/Spinner";
 
 const ShowAlbum = () => {
   const {id} = useParams();
-  const [album, setAlbum] = useState({});
-  const [loading, setLoading] = useState(false);
-  const { getAlbumById } = usePlaceholderService();
-
-  useEffect(() => {
-    onRequest();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
-
-  const onRequest = () => {
-    setLoading(true);
-    getAlbumById(id)
-      .then(onDataLoaded)
-      .then(() => setLoading(false));
-  }
-
-  const onDataLoaded = (data) => {
-    setAlbum(data);
-  }
+  const { data, loading } = useFetchItem('albums', id);
 
   if (loading) {
     return <Spinner />
@@ -38,7 +19,7 @@ const ShowAlbum = () => {
 
   return (
     <>
-      <PageHeading title={album.title} link="/albums"/>
+      <PageHeading title={data.title} link="/albums"/>
       <Tabs.Root variant="outline" defaultValue="basic">
         <Tabs.List>
           <Tabs.Trigger value="basic">
@@ -49,7 +30,7 @@ const ShowAlbum = () => {
           </Tabs.Trigger>
         </Tabs.List>
         <Tabs.Content value="basic">
-          <AlbumInfo id={id} userId={album.userId} />
+          <AlbumInfo id={id} userId={data.userId} />
         </Tabs.Content>
         <Tabs.Content value="photos">
           <AlbumPhotoList id={id} />

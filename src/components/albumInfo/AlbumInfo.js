@@ -1,43 +1,32 @@
-import { useState, useEffect } from "react";
 import { VStack, Text } from "@chakra-ui/react";
 
-import usePlaceholderService from "../../services/PlaceholderService";
+import { useFetchItem } from "../../hooks/useFetchItem";
 
 import Spinner from "../spinner/Spinner";
+import ErrorMessage from "../errorMessage/ErrorMessage";
 
 const AlbumInfo = ({id, userId}) => {
-  const [user, setUser] = useState();
-  const [loading, setLoading] = useState(false);
-  const { getUserById } = usePlaceholderService();
+  const { data, loading, error } = useFetchItem('users', userId);
 
-  console.log(`Info album id ${id}`);
-  console.log(`Info album userId ${userId}`);
-
-  useEffect(() => {
-    onRequest();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId]);
-
-  const  onRequest = () => {
-    // setLoading(true);
-    // getUserById(userId)
-    //   .then(onDataLoaded)
-    //   .then(() => setLoading(false));
+  const Info = () => {
+    return (
+      <VStack gap="2" alignItems="start">
+        <Text>ID: {id}</Text>
+        <Text>Name: {data.username}</Text>
+      </VStack>
+    )
   }
 
-  const onDataLoaded = (data) => {
-    setUser(data);
-  }
-
-  if (loading) {
-    return <Spinner/>
-  }
+  const errorMessage = error ? <ErrorMessage/> : null;
+  const spinner = loading ? <Spinner /> : null;
+  const content = !(loading || error) ? <Info/> : null;
 
   return (
-    <VStack gap="2" alignItems="start">
-      <Text>ID: {id}</Text>
-      <Text>Name: user.username</Text>
-    </VStack>
+    <>
+      {errorMessage}
+      {spinner}
+      {content}
+    </>
   )
 }
 

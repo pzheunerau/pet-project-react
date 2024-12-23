@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { Button, Input, Grid, GridItem, Stack, Text, createListCollection } from "@chakra-ui/react";
@@ -21,25 +21,16 @@ import {
 } from "../../components/ui/dialog";
 
 import usePlaceholderService from "../../services/PlaceholderService";
+import { useFetchListItems } from "../../hooks/useFetchListItems";
 
-const AlbumForm = ({ title, id, userId }) => {
+const AlbumForm = ({userId, id, title}) => {
   const [openDialog, setOpenDialog] = useState(false);
-  const [users, setUsers] = useState([]);
   const { register, handleSubmit, control, formState: {errors}, reset } = useForm();
-  const { getAllUsers, createAlbum, editAlbum } = usePlaceholderService();
+  const { createAlbum, editAlbum } = usePlaceholderService();
+
+  const { data } = useFetchListItems('users');
 
   const isEditMode = !!id;
-
-  useEffect(() => {
-    onRequest();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const onRequest = () => {
-    getAllUsers().then(data => {
-      setUsers(data);
-    });
-  }
 
   const onSubmit = (data) => {
     const newUserId = data.userId ? data.userId[0] : userId;
@@ -60,7 +51,7 @@ const AlbumForm = ({ title, id, userId }) => {
   };
 
   const usersList = createListCollection({
-    items: [...users],
+    items: [...data],
     itemToString: (item) => item.username,
     itemToValue: (item) => item.id
   });

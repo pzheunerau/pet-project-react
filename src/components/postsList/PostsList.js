@@ -1,30 +1,14 @@
-import { useState, useEffect } from "react";
 import { Link } from 'react-router-dom';
 import { Table, Link as ChakraLink } from "@chakra-ui/react";
 
-import usePlaceholderService from "../../services/PlaceholderService";
+import { useFetchListItems } from "../../hooks/useFetchListItems";
 
 import PageHeading from "../pageHeading/PageHeading";
 import Spinner from "../spinner/Spinner";
 import ErrorMessage from "../errorMessage/ErrorMessage";
 
 const PostsList = () => {
-  const [posts, setPosts] = useState([]);
-
-  const { getAllPosts, loading, error } = usePlaceholderService();
-
-  useEffect(() => {
-    onRequest();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const onRequest = () => {
-    getAllPosts().then(onDataLoaded);
-  }
-
-  const onDataLoaded = (data) => {
-    setPosts(data);
-  }
+  const { data, loading, error } = useFetchListItems('posts');
 
   function renderItems (arr) {
     const postsList = arr.map(item => {
@@ -59,7 +43,7 @@ const PostsList = () => {
     )
   }
   
-  const items = renderItems(posts);
+  const items = renderItems(data);
 
   const errorMessage = error ? <ErrorMessage/> : null;
   const spinner = loading ? <Spinner /> : null;

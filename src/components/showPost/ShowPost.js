@@ -1,47 +1,49 @@
 import { useParams } from "react-router-dom";
-import { useState, useEffect } from "react";
 
 import { VStack, HStack, Text } from "@chakra-ui/react";
 
-import usePlaceholderService from "../../services/PlaceholderService";
+import { useFetchItem } from "../../hooks/useFetchItem";
+
+import Spinner from "../spinner/Spinner";
+import ErrorMessage from "../errorMessage/ErrorMessage";
 
 const ShowPost = () => {
   const {id} = useParams();
-  const [post, setPost] = useState({});
-  const { getPostById } = usePlaceholderService();
+  const { data, loading, error } = useFetchItem('posts', id);
 
-  useEffect(() => {
-    onRequest();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
-
-  const onRequest = () => {
-    getPostById(id).then(onDataLoaded);
+  const Post = () => {
+    return (
+      <VStack alignItems="start">
+        <HStack alignItems="baseline">
+          <Text fontSize="xl" fontWeight="semibold">Id:</Text>
+          <Text>{data.id}</Text>
+        </HStack>
+        <HStack alignItems="baseline">
+          <Text fontSize="xl" fontWeight="semibold">Title:</Text>
+          <Text>{data.title}</Text>
+        </HStack>
+        <HStack alignItems="baseline">
+          <Text fontSize="xl" fontWeight="semibold">User Id:</Text>
+          <Text>{data.userId}</Text>
+        </HStack>
+        <HStack alignItems="baseline">
+          <Text fontSize="xl" fontWeight="semibold">Body:</Text>
+          <Text>{data.body}</Text>
+        </HStack>
+      </VStack>
+    )
   }
 
-  const onDataLoaded = (data) => {
-    setPost(data);
-  }
+  const errorMessage = error ? <ErrorMessage/> : null;
+  const spinner = loading ? <Spinner /> : null;
+  const content = !(loading || error) ? <Post /> : null;
 
   return (
-    <VStack alignItems="start">
-      <HStack alignItems="baseline">
-        <Text fontSize="xl" fontWeight="semibold">Id:</Text>
-        <Text>{post.id}</Text>
-      </HStack>
-      <HStack alignItems="baseline">
-        <Text fontSize="xl" fontWeight="semibold">Title:</Text>
-        <Text>{post.title}</Text>
-      </HStack>
-      <HStack alignItems="baseline">
-        <Text fontSize="xl" fontWeight="semibold">User Id:</Text>
-        <Text>{post.userId}</Text>
-      </HStack>
-      <HStack alignItems="baseline">
-        <Text fontSize="xl" fontWeight="semibold">Body:</Text>
-        <Text>{post.body}</Text>
-      </HStack>
-    </VStack>
+    <>
+      {errorMessage}
+      {spinner}
+      {content}
+    </>
   )
 }
 
