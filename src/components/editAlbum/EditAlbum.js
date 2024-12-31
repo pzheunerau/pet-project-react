@@ -12,22 +12,14 @@ const EditAlbum = () => {
   const { id } = useParams();
   const { data, loading, error } = useFetchItem('albums', id);
 
-  const Form = () => {
-    return (
-      <AlbumForm title={data.title} id={id} userId={data.userId} />
-    )
-  }
-
-  const errorMessage = error ? <ErrorMessage/> : null;
-  const spinner = loading ? <Spinner /> : null;
-  const content = !(loading || error) ? <Form /> : null;
-
   return (
     <>
       <PageHeading title="Edit album" link="/albums" />
-      {errorMessage}
-      {spinner}
-      {content}
+      {loading && <Spinner />}
+      {error && <ErrorMessage title="Something went wrong"/>}
+      {!(loading || error) && (
+        <AlbumForm title={data.title} id={id} userId={data.userId} />
+      )}
     </>
   )
 }

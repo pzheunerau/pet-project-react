@@ -1,37 +1,33 @@
-// import { useState, useCallback, useEffect } from "react";
 import { useState, useCallback } from "react";
 import apiClient from "../services/apiClient";
 
 export const useDeleteItem = (url, id) => {
-  const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [seccess, setSeccess] = useState(false);
 
   const request = useCallback(async () => {
-    if (!url || !id) return;
-
     setLoading(true);
+    setError(null);
+    setSeccess(false);
 
     try {
       const response = await apiClient.delete(`${url}/${id}`);
-      setData(response.data);
-      setError(null);
+      setSeccess(true);
+      return response;
     } catch(error) {
       setError(error);
+      throw error;
     } finally {
       setLoading(false);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // useEffect(() => {
-  //   request()
-  // }, [request]);
-
   return {
-    data,
+    request,
     loading,
     error,
-    request,
+    seccess
   }
 }

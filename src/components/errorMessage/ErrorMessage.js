@@ -1,8 +1,8 @@
 import { Alert } from "../../components/ui/alert";
 
-const ErrorMessage = () => {
+const ErrorMessage = ({title = "No data yet"}) => {
   return (
-    <Alert status="error" title="There was an error processing your request"/>
+    <Alert status="error" title={title}/>
   )
 }
 

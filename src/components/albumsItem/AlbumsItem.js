@@ -4,20 +4,33 @@ import { LuEye } from "react-icons/lu";
 import { LuPencilLine } from "react-icons/lu";
 import { LuTrash2 } from "react-icons/lu";
 
-// import usePlaceholderService from "../../services/PlaceholderService";
+import { toaster } from "../../components/ui/toaster";
+
 import { useDeleteItem } from "../../hooks/useDeleteItem";
 
 const AlbumsItem = (props) => {
   const { id, userId, title, callback } = props;
-  const { request, data } = useDeleteItem('albums', id);
-  // const { deleteAlbumById } = usePlaceholderService();
-
-  // const deleteHandler = (id) => {
-  //   deleteAlbumById(id).then(callback());
-  // }
+  const { request: onDeleteItem } = useDeleteItem('albums', id);
 
   const deleteHandle = () => {
-    request().then(() => console.log(data)).then(callback());
+    onDeleteItem()
+    .then(callback())
+    .catch(error => console.log(error));
+
+    toaster.promise(onDeleteItem, {
+      success: {
+        title: "Deletion successfully!",
+        description: "Album deleted",
+      },
+      error: {
+        title: "Deletion failed!",
+        description: "Something wrong with the deletion",
+      },
+      loading: { 
+        title: "Loading...",
+        description: "Please wait" 
+      },
+    })
   }
 
   return (

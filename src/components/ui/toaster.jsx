@@ -1,3 +1,14 @@
+'use client'
+
+import {
+  Toaster as ChakraToaster,
+  Portal,
+  Spinner,
+  Stack,
+  Toast,
+  createToaster,
+} from '@chakra-ui/react';
+
 function _optionalChain(ops) {
   let lastAccessLHS = undefined
   let value = ops[0]
@@ -13,22 +24,13 @@ function _optionalChain(ops) {
       lastAccessLHS = value
       value = fn(value)
     } else if (op === 'call' || op === 'optionalCall') {
+      // eslint-disable-next-line no-loop-func
       value = fn((...args) => value.call(lastAccessLHS, ...args))
       lastAccessLHS = undefined
     }
   }
   return value
 }
-;('use client')
-
-import {
-  Toaster as ChakraToaster,
-  Portal,
-  Spinner,
-  Stack,
-  Toast,
-  createToaster,
-} from '@chakra-ui/react'
 
 export const toaster = createToaster({
   placement: 'bottom-end',

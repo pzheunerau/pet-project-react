@@ -1,4 +1,7 @@
+// import { useEffect } from "react";
 import { Table } from "@chakra-ui/react";
+
+// import { toaster } from "../../components/ui/toaster";
 
 import { useFetchListItems } from "../../hooks/useFetchListItems";
 
@@ -10,42 +13,37 @@ import ErrorMessage from "../errorMessage/ErrorMessage";
 const AlbumsList = () => {
   const { data, loading, error, request } = useFetchListItems('albums');
 
-  function renderItems(arr) {
-    const albumsList = arr.map(item => {
-      return (
-        <AlbumsItem key={item.id} {...item} callback={request}/>
-      )
-    })
-
-    return (
-      <Table.Root>
-        <Table.Header>
-          <Table.Row>
-            <Table.ColumnHeader>Id</Table.ColumnHeader>
-            <Table.ColumnHeader>User Id</Table.ColumnHeader>
-            <Table.ColumnHeader>Title</Table.ColumnHeader>
-            <Table.ColumnHeader>Actions</Table.ColumnHeader>
-          </Table.Row>
-        </Table.Header>
-        <Table.Body>
-          {albumsList}
-        </Table.Body>
-      </Table.Root>
-    )
-  }
-
-  const items = renderItems(data);
-
-  const errorMessage = error ? <ErrorMessage/> : null;
-  const spinner = loading ? <Spinner /> : null;
-  const content = !(loading || error) ? items : null;
+  // useEffect(() => {
+  //   if (error) {
+  //     toaster.create({
+  //       title: "Not data yet",
+  //       type: "error",
+  //     })
+  //   }
+  // }, [error]);
 
   return (
     <>
       <PageHeading title="Albums" buttonTitle="Create album" link="create"/>
-      {errorMessage}
-      {spinner}
-      {content}
+      {loading && <Spinner />}
+      {error && <ErrorMessage/>}
+      {!(loading || error) && (
+        <Table.Root>
+          <Table.Header>
+            <Table.Row>
+              <Table.ColumnHeader>Id</Table.ColumnHeader>
+              <Table.ColumnHeader>User Id</Table.ColumnHeader>
+              <Table.ColumnHeader>Title</Table.ColumnHeader>
+              <Table.ColumnHeader>Actions</Table.ColumnHeader>
+            </Table.Row>
+          </Table.Header>
+          <Table.Body>
+            {data.map((item) => (
+              <AlbumsItem key={item.id} {...item} callback={request}/>
+            ))}
+          </Table.Body>
+        </Table.Root>
+      )}
     </>
   )
 }

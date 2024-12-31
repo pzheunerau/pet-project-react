@@ -8,24 +8,16 @@ import ErrorMessage from "../errorMessage/ErrorMessage";
 const AlbumInfo = ({id, userId}) => {
   const { data, loading, error } = useFetchItem('users', userId);
 
-  const Info = () => {
-    return (
-      <VStack gap="2" alignItems="start">
-        <Text>ID: {id}</Text>
-        <Text>Name: {data.username}</Text>
-      </VStack>
-    )
-  }
-
-  const errorMessage = error ? <ErrorMessage/> : null;
-  const spinner = loading ? <Spinner /> : null;
-  const content = !(loading || error) ? <Info/> : null;
-
   return (
     <>
-      {errorMessage}
-      {spinner}
-      {content}
+      {loading && <Spinner />}
+      {error && <ErrorMessage title="Something went wrong" />}
+      {!(loading || error) && (
+        <VStack gap="2" alignItems="start">
+          <Text>ID: {id}</Text>
+          <Text>Name: {data.username}</Text>
+        </VStack>
+      )}
     </>
   )
 }
