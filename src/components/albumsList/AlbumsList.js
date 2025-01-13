@@ -1,7 +1,4 @@
-// import { useEffect } from "react";
 import { Table } from "@chakra-ui/react";
-
-// import { toaster } from "../../components/ui/toaster";
 
 import { useFetchListItems } from "../../hooks/useFetchListItems";
 
@@ -12,15 +9,6 @@ import ErrorMessage from "../errorMessage/ErrorMessage";
 
 const AlbumsList = () => {
   const { data, loading, error, request } = useFetchListItems('albums');
-
-  // useEffect(() => {
-  //   if (error) {
-  //     toaster.create({
-  //       title: "Not data yet",
-  //       type: "error",
-  //     })
-  //   }
-  // }, [error]);
 
   return (
     <>

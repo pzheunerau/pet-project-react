@@ -1,8 +1,5 @@
-// import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Table, Link as ChakraLink } from "@chakra-ui/react";
-
-// import { toaster } from "../../components/ui/toaster";
 
 import { useFetchListItems } from "../../hooks/useFetchListItems";
 
@@ -12,15 +9,6 @@ import ErrorMessage from "../errorMessage/ErrorMessage";
 
 const PostsList = () => {
   const { data, loading, error } = useFetchListItems('posts');
-
-  // useEffect(() => {
-  //   if (error) {
-  //     toaster.create({
-  //       title: "Not data yet",
-  //       type: "error",
-  //     })
-  //   }
-  // }, [error]);
 
   return (
     <>

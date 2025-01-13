@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
-import { Button, Input, Grid, GridItem, Stack, Text, createListCollection } from "@chakra-ui/react";
+import { Button, Input, Grid, GridItem, Stack, createListCollection } from "@chakra-ui/react";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 import { Field } from "../../components/ui/field";
 import {
   SelectContent,
@@ -10,29 +11,47 @@ import {
   SelectTrigger,
   SelectValueText,
 } from "../../components/ui/select";
-import {
-  DialogRoot,
-  DialogBody,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-  DialogActionTrigger 
-} from "../../components/ui/dialog";
+import { NativeSelectField, NativeSelectRoot } from "../../components/ui/native-select";
 import { toaster } from "../../components/ui/toaster";
+
+import { ConfirmationDialog } from "./components";
 
 import { useFetchListItems } from "../../hooks/useFetchListItems";
 import { useCreateItem } from "../../hooks/useCreateItem";
 import { useEditItem } from "../../hooks/useEditItem";
 
+const schema = yup.object().shape({
+  title: yup.string().required('Title is required'),
+  userId: yup.number().required('Choose user'),
+  company: yup.string().required('Choose company'),
+}).required();
+
 const AlbumForm = ({userId, id, title}) => {
   const [openDialog, setOpenDialog] = useState(false);
   const [albumTitle, setAlbumTitle] = useState(null);
-  const { register, handleSubmit, control, formState: {errors}, reset } = useForm();
+  const { register, handleSubmit, control, formState: {errors}, reset } = useForm({
+    resolver: yupResolver(schema),
+  });
 
-  const { data: users, error: usersError } = useFetchListItems('users');
-  const { request: onCreateItem, error: createdError } = useCreateItem();
-  const { request: onEditItem, error: editedError } = useEditItem();
+  const { 
+    data: users, 
+    error: usersError, 
+    loading: usersLoading 
+  } = useFetchListItems('users');
+  const { 
+    request: onCreateItem, 
+    data: createdItem, 
+    loading: createdLoading,
+    error: createdError, 
+    seccess: createdSeccess 
+  } = useCreateItem();
+  const { 
+    request: onEditItem, 
+    data: editedItem, 
+    loading: editedLoading,
+    error: editedError, 
+    seccess: editedSeccess 
+  } = useEditItem();
 
   useEffect(() => {
     if (usersError) {
@@ -42,7 +61,9 @@ const AlbumForm = ({userId, id, title}) => {
         type: "error"
       })
     }
-
+  }, [usersError]);
+  
+  useEffect(() => {
     if (createdError) {
       toaster.create({
         title: "No album created",
@@ -50,7 +71,9 @@ const AlbumForm = ({userId, id, title}) => {
         type: "error"
       })
     }
+  }, [createdError]);
 
+  useEffect(() => {
     if (editedError) {
       toaster.create({
         title: "No album edited",
@@ -58,12 +81,31 @@ const AlbumForm = ({userId, id, title}) => {
         type: "error"
       })
     }
-  }, [usersError, createdError, editedError]);
+  }, [editedError]);
+
+  useEffect(() => {
+    if (createdSeccess) {
+      setAlbumTitle(createdItem.title);
+      setOpenDialog(true);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [createdSeccess]);
+  
+  useEffect(() => {
+    if (editedSeccess) {
+      setAlbumTitle(editedItem.title);
+      setOpenDialog(true);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editedSeccess]);
 
   const isEditMode = !!id;
+  const isLoadingResponse = usersLoading || createdLoading || editedLoading;
 
   const onSubmit = (data) => {
-    const newUserId = data.userId ? data.userId[0] : userId;
+    console.log(data);
+
+    const newUserId = data.userId ? data.userId : userId;
 
     const newAlbum = {
       title: data.title,
@@ -73,53 +115,19 @@ const AlbumForm = ({userId, id, title}) => {
     console.log(newAlbum);
 
     if (isEditMode) {
-      onEditItem(newAlbum, id)
-        .then(setAlbumTitle(data.title))
-        .then(setOpenDialog(true));
+      onEditItem(newAlbum, id);
     } else {
-      onCreateItem(newAlbum)
-        .then(setAlbumTitle(data.title))
-        .then(setOpenDialog(true));
+      onCreateItem(newAlbum);
     }
   };
+
+  const companyList = users.map(item => item.company.name);
 
   const usersList = createListCollection({
     items: [...users],
     itemToString: (item) => item.username,
     itemToValue: (item) => item.id
   });
-
-  const ConfirmationDialog = ({open, setOpen, albumTitle}) => {
-    const navigate = useNavigate();
-  
-    return (
-      <DialogRoot open={open} onOpenChange={(e) => setOpen(e.open)} placement="center" motionPreset="slide-in-bottom">
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              {albumTitle}
-            </DialogTitle>
-          </DialogHeader>
-          <DialogBody>
-            <Text mb={2}>{isEditMode ? "Album edited" : "Album created"}</Text>
-            <Text>
-              {`Choose whether you want to ${isEditMode ? "edit current album" : "create a new album"} or return to the shared list.`}
-              </Text>
-          </DialogBody>
-          <DialogFooter>
-            <DialogActionTrigger asChild>
-              {isEditMode ? 
-                <Button>Edit current</Button>
-              : 
-                <Button onClick={() => reset()}>Create a new</Button>
-              }
-            </DialogActionTrigger>
-            <Button variant="outline" onClick={() => { navigate('/albums') }}>Back to list</Button>
-          </DialogFooter>
-        </DialogContent>
-      </DialogRoot>
-    )
-  }
 
   return (
     <>
@@ -150,7 +158,7 @@ const AlbumForm = ({userId, id, title}) => {
               label="User"
               invalid={!!errors.userId}
               errorText={errors.userId?.message}
-              disabled={usersError}
+              disabled={usersLoading || usersError}
             >
               <Controller
                 control={control}
@@ -162,10 +170,10 @@ const AlbumForm = ({userId, id, title}) => {
                     value={field.value}
                     onValueChange={({value}) => field.onChange(value)}
                     onInteractOutside={() => field.onBlur()}
-                    defaultValue={[userId]}
+                    defaultValue={isEditMode ? [userId] : []}
                   >
                     <SelectTrigger>
-                      <SelectValueText />
+                      <SelectValueText placeholder="Select User" />
                     </SelectTrigger>
                     <SelectContent>
                       {usersList.items.map((item) => (
@@ -179,10 +187,28 @@ const AlbumForm = ({userId, id, title}) => {
               />
             </Field>
           </GridItem>
+          <GridItem>
+            <Field
+              label="Company"
+              invalid={!!errors.company}
+              errorText={errors.company?.message}
+            >
+              <NativeSelectRoot>
+                <NativeSelectField
+                  {...register("company", {
+                    // value: "Romaguera-Crona"
+                    // defaultValue: "Romaguera-Crona"
+                  })}
+                  placeholder="Select company"
+                  items={companyList}
+                />
+              </NativeSelectRoot>
+            </Field>
+          </GridItem>
           <GridItem colSpan="2">
             <Stack direction="row" gap="2">
-              <Button type="submit">Submit</Button>
-              <Button type="reset">Cancel</Button>
+              <Button disabled={isLoadingResponse} type="submit">Submit</Button>
+              <Button disabled={isLoadingResponse} type="reset">Cancel</Button>
             </Stack>
           </GridItem>
         </Grid>
@@ -190,7 +216,9 @@ const AlbumForm = ({userId, id, title}) => {
       <ConfirmationDialog
         open={openDialog}
         setOpen={setOpenDialog}
-        albumTitle={albumTitle} 
+        albumTitle={albumTitle}
+        isEditMode={isEditMode}
+        callback={reset}
       />
     </>
   )

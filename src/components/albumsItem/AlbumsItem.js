@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+
 import { Table, IconButton, HStack } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import { LuEye } from "react-icons/lu";
@@ -10,27 +12,35 @@ import { useDeleteItem } from "../../hooks/useDeleteItem";
 
 const AlbumsItem = (props) => {
   const { id, userId, title, callback } = props;
-  const { request: onDeleteItem } = useDeleteItem('albums', id);
+  const { request: onDeleteItem, loading, error, seccess } = useDeleteItem('albums', id);
 
-  const deleteHandle = () => {
-    onDeleteItem()
-    .then(callback())
-    .catch(error => console.log(error));
+  useEffect(() => {
+    if (error) {
+      console.log("error!!!")
 
-    toaster.promise(onDeleteItem, {
-      success: {
-        title: "Deletion successfully!",
-        description: "Album deleted",
-      },
-      error: {
+      toaster.create({
         title: "Deletion failed!",
         description: "Something wrong with the deletion",
-      },
-      loading: { 
-        title: "Loading...",
-        description: "Please wait" 
-      },
-    })
+        type: "error"
+      })
+    }
+  }, [error]);
+
+  useEffect(() => {
+    if (seccess) {
+      callback();
+
+      toaster.create({
+        title: "Deletion successfully!",
+        description: "Album deleted",
+        type: "success"
+      })
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [seccess]);
+
+  const deleteHandle = () => {
+    onDeleteItem();
   }
 
   return (
@@ -57,6 +67,7 @@ const AlbumsItem = (props) => {
             rounded="full"
             aria-label="Delete"
             colorPalette="red"
+            disabled={loading}
             onClick={() => {
               deleteHandle()
             }}

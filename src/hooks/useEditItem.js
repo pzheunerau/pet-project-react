@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import apiClient from "../services/apiClient";
 
 export const useEditItem = () => {
+  const [data, setData] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [seccess, setSeccess] = useState(false);
@@ -17,6 +18,7 @@ export const useEditItem = () => {
         userId: album.userId,
       });
       setSeccess(true);
+      setData(response.data);
       return response.data;
     } catch(error) {
       setError(error);
@@ -28,6 +30,7 @@ export const useEditItem = () => {
   }, []);
 
   return {
+    data,
     request,
     loading,
     error,
