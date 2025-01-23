@@ -1,16 +1,9 @@
 import { useState, useEffect } from "react";
-import { useForm, Controller } from "react-hook-form";
-import { Button, Input, Grid, GridItem, Stack, createListCollection } from "@chakra-ui/react";
+import { useForm } from "react-hook-form";
+import { Button, Input, Grid, GridItem, Stack } from "@chakra-ui/react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { Field } from "../../components/ui/field";
-import {
-  SelectContent,
-  SelectItem,
-  SelectRoot,
-  SelectTrigger,
-  SelectValueText,
-} from "../../components/ui/select";
 import { NativeSelectField, NativeSelectRoot } from "../../components/ui/native-select";
 import { toaster } from "../../components/ui/toaster";
 
@@ -22,21 +15,25 @@ import { useEditItem } from "../../hooks/useEditItem";
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
-  userId: yup.number().required('Choose user'),
-  company: yup.string().required('Choose company'),
+  username: yup.string().required('Choose user'),
 }).required();
 
-const AlbumForm = ({userId, id, title}) => {
+const AlbumForm = ({userId, albumId, title}) => {
   const [openDialog, setOpenDialog] = useState(false);
   const [albumTitle, setAlbumTitle] = useState(null);
-  const { register, handleSubmit, control, formState: {errors}, reset } = useForm({
+  const { register, handleSubmit, formState: {errors}, reset, setValue } = useForm({
     resolver: yupResolver(schema),
+    // defaultValues: {
+    //   title: "Test",
+    //   username: ""
+    // }
   });
 
-  const { 
+  const {
     data: users, 
     error: usersError, 
-    loading: usersLoading 
+    loading: usersLoading,
+    seccess: usersSeccess
   } = useFetchListItems('users');
   const { 
     request: onCreateItem, 
@@ -99,35 +96,42 @@ const AlbumForm = ({userId, id, title}) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editedSeccess]);
 
-  const isEditMode = !!id;
+  useEffect(() => {
+    if (usersSeccess && !!albumId) {
+      const currentUserName = users.find(user => user.id === userId).username;
+      setValue('username', currentUserName, {
+        shouldValidate: true,
+        shouldDirty: true,
+        shouldTouch: true
+      })
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [users]);
+
+  const isEditMode = !!albumId;
   const isLoadingResponse = usersLoading || createdLoading || editedLoading;
+  const userList = users.map(item => item.username);
+
+  const getUserId = (username) => {
+    return (
+      users.find(user => user.username === username).id
+    )
+  }
 
   const onSubmit = (data) => {
-    console.log(data);
-
-    const newUserId = data.userId ? data.userId : userId;
-
     const newAlbum = {
       title: data.title,
-      userId: newUserId,
+      userId: getUserId(data.username),
     }
 
     console.log(newAlbum);
 
     if (isEditMode) {
-      onEditItem(newAlbum, id);
+      onEditItem(newAlbum, albumId);
     } else {
       onCreateItem(newAlbum);
     }
   };
-
-  const companyList = users.map(item => item.company.name);
-
-  const usersList = createListCollection({
-    items: [...users],
-    itemToString: (item) => item.username,
-    itemToValue: (item) => item.id
-  });
 
   return (
     <>
@@ -156,51 +160,14 @@ const AlbumForm = ({userId, id, title}) => {
           <GridItem>
             <Field
               label="User"
-              invalid={!!errors.userId}
-              errorText={errors.userId?.message}
-              disabled={usersLoading || usersError}
-            >
-              <Controller
-                control={control}
-                name="userId"
-                render={({field}) => (
-                  <SelectRoot
-                    collection={usersList}
-                    name={field.name}
-                    value={field.value}
-                    onValueChange={({value}) => field.onChange(value)}
-                    onInteractOutside={() => field.onBlur()}
-                    defaultValue={isEditMode ? [userId] : []}
-                  >
-                    <SelectTrigger>
-                      <SelectValueText placeholder="Select User" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {usersList.items.map((item) => (
-                        <SelectItem key={item.id} item={item}>
-                          {item.username}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </SelectRoot>
-                )}
-              />
-            </Field>
-          </GridItem>
-          <GridItem>
-            <Field
-              label="Company"
-              invalid={!!errors.company}
-              errorText={errors.company?.message}
+              invalid={!!errors.username}
+              errorText={errors.username?.message}
             >
               <NativeSelectRoot>
                 <NativeSelectField
-                  {...register("company", {
-                    // value: "Romaguera-Crona"
-                    // defaultValue: "Romaguera-Crona"
-                  })}
-                  placeholder="Select company"
-                  items={companyList}
+                  {...register("username")}
+                  placeholder="Select User"
+                  items={userList}
                 />
               </NativeSelectRoot>
             </Field>

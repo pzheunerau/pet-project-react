@@ -5,14 +5,17 @@ export const useFetchListItems = (url) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [seccess, setSeccess] = useState(false);
 
   const request = useCallback(async () => {
     if (!url) return;
 
     setLoading(true);
+    setSeccess(false);
 
     try {
       const response = await apiClient.get(url);
+      setSeccess(true);
       setData(response.data);
       setError(null);
     } catch(error) {
@@ -31,6 +34,7 @@ export const useFetchListItems = (url) => {
     data,
     loading,
     error,
+    seccess,
     request,
   }
 }

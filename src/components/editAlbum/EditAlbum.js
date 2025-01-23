@@ -18,7 +18,7 @@ const EditAlbum = () => {
       {loading && <Spinner />}
       {error && <ErrorMessage title="Something went wrong"/>}
       {!(loading || error) && (
-        <AlbumForm title={data.title} id={id} userId={data.userId} />
+        <AlbumForm title={data.title} albumId={id} userId={data.userId} />
       )}
     </>
   )
