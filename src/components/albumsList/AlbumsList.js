@@ -12,7 +12,7 @@ const AlbumsList = () => {
 
   return (
     <>
-      <PageHeading title="Albums" buttonTitle="Create album" link="create"/>
+      <PageHeading title="Albums" linkTitle="Create album" link="create"/>
       {loading && <Spinner />}
       {error && <ErrorMessage/>}
       {!(loading || error) && (

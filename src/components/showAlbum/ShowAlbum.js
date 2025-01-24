@@ -38,13 +38,13 @@ const ShowAlbum = () => {
       {loading && <Spinner />}
       {error && 
         <>
-          <PageHeading link="/albums"/>
+          <PageHeading goBack/>
           <ErrorMessage title="Something went wrong" />
         </>
       }
       {!(loading || error) && (
         <>
-          <PageHeading title={data.title} link="/albums"/>
+          <PageHeading title={data.title} goBack/>
           <Tabs.Root variant="outline" defaultValue="basic">
             <Tabs.List>
               <Tabs.Trigger value="basic">

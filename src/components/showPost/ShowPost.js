@@ -34,7 +34,7 @@ const ShowPost = () => {
 
   return (
     <>
-      <PageHeading link="/posts"/>
+      <PageHeading goBack/>
       {loading && <Spinner />}
       {error && <ErrorMessage title="Something went wrong"/>}
       {!(loading || error) && (

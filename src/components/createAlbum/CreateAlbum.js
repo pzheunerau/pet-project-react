@@ -4,7 +4,7 @@ import AlbumForm from "../albumForm/AlbumForm";
 const CreateAlbum = () => {
   return (
     <>
-      <PageHeading title="Create album" link="/albums"/>
+      <PageHeading title="Create album" goBack/>
       <AlbumForm/>
     </>
   )

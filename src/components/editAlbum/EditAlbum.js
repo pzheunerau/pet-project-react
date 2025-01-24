@@ -14,7 +14,7 @@ const EditAlbum = () => {
 
   return (
     <>
-      <PageHeading title="Edit album" link="/albums" />
+      <PageHeading title="Edit album" goBack />
       {loading && <Spinner />}
       {error && <ErrorMessage title="Something went wrong"/>}
       {!(loading || error) && (
