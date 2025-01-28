@@ -47,7 +47,6 @@ const AdminPage = () => {
         </GridItem>
         <GridItem as="main" p="5" overflowY="auto">
           <Outlet />
-          
         </GridItem>
       </Grid>
       <Toaster />
