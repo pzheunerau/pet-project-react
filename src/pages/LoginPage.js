@@ -1,21 +1,27 @@
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Button, Input, Stack, Heading, Center, Container } from "@chakra-ui/react";
 import { Field } from "../components/ui/field";
 import { PasswordInput } from "../components/ui/password-input";
+import { useAuth } from "../hooks/useAuth";
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const {signIn} = useAuth();
   const { register, handleSubmit, formState: {errors} } = useForm({
     defaultValues: {
       email: "",
       password: ""
     }
   });
+
+  const fromPage = location.state?.from?.pathname + location.state?.from?.search || '/';
+
   const onSubmit = (data) => {
     console.log(data);
-    localStorage.setItem('isLogined', true);
-    navigate('/');
+
+    signIn(() => navigate(fromPage));
   };
 
   return (

@@ -6,14 +6,16 @@ import {
   Center,
   Button,
 } from "@chakra-ui/react";
+
 import { Toaster } from "../components/ui/toaster";
+import { useAuth } from '../hooks/useAuth';
 
 const AdminPage = () => {
   const navigate = useNavigate();
+  const {signOut} = useAuth();
 
   const logOut = () => {
-    localStorage.removeItem('isLogined');
-    navigate('/login');
+    signOut(() => navigate('/login'));
   }
 
   return (

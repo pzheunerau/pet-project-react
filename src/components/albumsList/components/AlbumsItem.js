@@ -6,9 +6,9 @@ import { LuEye } from "react-icons/lu";
 import { LuPencilLine } from "react-icons/lu";
 import { LuTrash2 } from "react-icons/lu";
 
-import { toaster } from "../../components/ui/toaster";
+import { toaster } from "../../ui/toaster";
 
-import { useDeleteItem } from "../../hooks/useDeleteItem";
+import { useDeleteItem } from "../../../hooks/useDeleteItem";
 
 const AlbumsItem = (props) => {
   const { id, userId, title, callback } = props;

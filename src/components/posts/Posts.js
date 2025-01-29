@@ -9,7 +9,8 @@ import {
 } from "../ui/pagination";
 
 import { useFetchListItems } from "../../hooks/useFetchListItems";
-import { ErrorMessage, PageHeading, PostsList, Spinner } from "..";
+import { ErrorMessage, PageHeading, Spinner } from "..";
+import { PostsList } from "./components";
 
 const Posts = () => {
   const [pageNumber, setPageNumber] = useState(1);
